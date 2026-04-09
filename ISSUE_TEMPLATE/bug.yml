@@ -1,0 +1,32 @@
+name: Bug Report
+description: Reportar um problema
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descricao do problema
+      placeholder: O que aconteceu?
+    validations:
+      required: true
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Passos para reproduzir
+      placeholder: "1. Acesse...\n2. Clique em...\n3. Veja o erro"
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Comportamento esperado
+  - type: dropdown
+    id: severidade
+    attributes:
+      label: Severidade
+      options:
+        - Critico (producao parada)
+        - Alto (funcionalidade quebrada)
+        - Medio (funcionalidade parcial)
+        - Baixo (cosmetico)
