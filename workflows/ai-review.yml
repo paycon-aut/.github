@@ -1,0 +1,40 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-review:
+    name: AI Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: AI Code Review
+        uses: coderabbitai/ai-pr-reviewer@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          debug: false
+          review_simple_changes: false
+          review_comment_lgtm: false
+          openai_light_model: gpt-4o-mini
+          openai_heavy_model: gpt-4o
+          system_message: |
+            Voce e um revisor de codigo senior da Paycon Automacoes.
+            Revise o codigo com foco em:
+            - Seguranca (secrets expostos, SQL injection, XSS)
+            - Boas praticas Python/Odoo
+            - Performance
+            - Legibilidade e manutencao
+            - Conformidade com padroes do projeto
+            Responda sempre em portugues brasileiro.
+            Seja objetivo e sugira melhorias concretas.
