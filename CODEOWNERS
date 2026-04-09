@@ -1,0 +1,30 @@
+# ============================================
+# CODEOWNERS - Paycon Automacoes
+# Organizacao: paycon-aut
+# ============================================
+
+# Regra global - todo PR precisa de pelo menos um review
+*                           @paycon-aut/infra-security
+
+# Infraestrutura - obrigatorio time de Infra & Security
+/infra/                     @paycon-aut/infra-security
+/.github/workflows/         @paycon-aut/infra-security
+/Dockerfile                 @paycon-aut/infra-security
+docker-compose*.yml         @paycon-aut/infra-security
+
+# Odoo - modulos e customizacoes
+/odoo/                      @paycon-aut/odoo
+/addons/                    @paycon-aut/odoo
+
+# IA - modelos e automacoes inteligentes
+/ai/                        @paycon-aut/ia
+/ml/                        @paycon-aut/ia
+
+# RPA - automacoes roboticas
+/rpa/                       @paycon-aut/rpa
+/bots/                      @paycon-aut/rpa
+
+# Seguranca - dependencias e autenticacao
+requirements.txt            @paycon-aut/infra-security
+requirements*.txt           @paycon-aut/infra-security
+pyproject.toml              @paycon-aut/infra-security
