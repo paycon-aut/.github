@@ -2,38 +2,23 @@ name: AI Code Review
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
 
 jobs:
   ai-review:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       pull-requests: write
-
+      issues: write
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: AI Code Review
-        uses: coderabbitai/ai-pr-reviewer@latest
+      - name: PR Agent Review
+        uses: qodo-ai/pr-agent@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
-        with:
-          language: pt-BR
-          review_simple_changes: false
-          review_comment_lgtm: false
-          openai_light_model: gpt-4o-mini
-          openai_heavy_model: gpt-4o-mini
-          max_tokens: 500
-
-          summarize: |
-            Responda em português do Brasil.
-            NÃO gere walkthrough, poema ou explicações longas.
-            Retorne apenas:
-
-            - Problemas encontrados
-            - Riscos de segurança
-            - Sugestões objetivas
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_action_config.auto_review: "true"
+          config.language: "pt-br"
