@@ -1,15 +1,25 @@
 [config]
 language = "pt-br"
 
-[pr_reviewer]
-enable_review_labels_security = true
-enable_review_labels_effort = false
-
 [pr_description]
 publish_labels = false
 generate_ai_title = true
-language = "pt-br"
 
-[custom_model]
-# usa sua própria chave OpenAI
-model = "gpt-4o-mini"
+[pr_reviewer]
+require_score_review = false
+require_tests_review = false
+require_estimate_effort_to_review = false
+extra_instructions = """
+- Responda sempre em português do Brasil
+- Seja objetivo e direto
+- Foque em: problemas encontrados, riscos de segurança e sugestões práticas
+- Não gere poemas, walkthroughs longos ou explicações óbvias
+"""
+
+[pr_code_suggestions]
+num_code_suggestions = 4
+
+[github_action_config]
+auto_review = true
+auto_describe = true
+auto_improve = false
