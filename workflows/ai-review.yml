@@ -4,19 +4,16 @@ on:
   pull_request:
     types: [opened, reopened]
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   ai-review:
-    name: AI Review
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: AI Code Review
         uses: coderabbitai/ai-pr-reviewer@latest
@@ -25,56 +22,18 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
         with:
-          debug: false
-
+          language: pt-BR
           review_simple_changes: false
-
           review_comment_lgtm: false
-
           openai_light_model: gpt-4o-mini
           openai_heavy_model: gpt-4o-mini
+          max_tokens: 500
 
-          max_tokens: 800
+          summarize: |
+            Responda em português do Brasil.
+            NÃO gere walkthrough, poema ou explicações longas.
+            Retorne apenas:
 
-          system_message: |
-            Você é um revisor de código sênior da Paycon Automações.
-
-            Responda SEMPRE em português do Brasil.
-
-            Seja direto, técnico e objetivo.
-
-            NÃO inclua:
-            - piadas
-            - metáforas
-            - poemas
-            - explicações desnecessárias
-
-            Foque apenas em problemas relevantes:
-
-            1. Segurança
-               - secrets expostos
-               - SQL injection
-               - XSS
-               - permissões incorretas
-
-            2. Boas práticas (Python/Odoo)
-            3. Performance
-            4. Legibilidade e manutenção
-
-            Ignore completamente:
-            - código trivial
-            - sugestões irrelevantes
-            - comentários óbvios
-
-            Ao responder, use o formato:
-
-            ## 🔎 Resumo
-            (resumo breve)
-
-            ## ❗ Problemas encontrados
-            (apenas se houver problemas reais)
-
-            ## 💡 Sugestões
-            (somente melhorias relevantes)
-
-            Seja conciso.
+            - Problemas encontrados
+            - Riscos de segurança
+            - Sugestões objetivas
