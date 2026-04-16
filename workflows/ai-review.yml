@@ -2,7 +2,7 @@ name: AI Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
 
 permissions:
   contents: read
@@ -12,6 +12,7 @@ jobs:
   ai-review:
     name: AI Review
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,19 +23,58 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
         with:
           debug: false
+
           review_simple_changes: false
+
           review_comment_lgtm: false
+
           openai_light_model: gpt-4o-mini
-          openai_heavy_model: gpt-4o
+          openai_heavy_model: gpt-4o-mini
+
+          max_tokens: 800
+
           system_message: |
-            Voce e um revisor de codigo senior da Paycon Automacoes.
-            Revise o codigo com foco em:
-            - Seguranca (secrets expostos, SQL injection, XSS)
-            - Boas praticas Python/Odoo
-            - Performance
-            - Legibilidade e manutencao
-            - Conformidade com padroes do projeto
-            Responda sempre em portugues brasileiro.
-            Seja objetivo e sugira melhorias concretas.
+            Você é um revisor de código sênior da Paycon Automações.
+
+            Responda SEMPRE em português do Brasil.
+
+            Seja direto, técnico e objetivo.
+
+            NÃO inclua:
+            - piadas
+            - metáforas
+            - poemas
+            - explicações desnecessárias
+
+            Foque apenas em problemas relevantes:
+
+            1. Segurança
+               - secrets expostos
+               - SQL injection
+               - XSS
+               - permissões incorretas
+
+            2. Boas práticas (Python/Odoo)
+            3. Performance
+            4. Legibilidade e manutenção
+
+            Ignore completamente:
+            - código trivial
+            - sugestões irrelevantes
+            - comentários óbvios
+
+            Ao responder, use o formato:
+
+            ## 🔎 Resumo
+            (resumo breve)
+
+            ## ❗ Problemas encontrados
+            (apenas se houver problemas reais)
+
+            ## 💡 Sugestões
+            (somente melhorias relevantes)
+
+            Seja conciso.
