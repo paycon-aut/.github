@@ -1,0 +1,15 @@
+[config]
+language = "pt-br"
+
+[pr_reviewer]
+enable_review_labels_security = true
+enable_review_labels_effort = false
+
+[pr_description]
+publish_labels = false
+generate_ai_title = true
+language = "pt-br"
+
+[custom_model]
+# usa sua própria chave OpenAI
+model = "gpt-4o-mini"
