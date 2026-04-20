@@ -9,17 +9,16 @@ generate_ai_title = true
 require_score_review = false
 require_tests_review = false
 require_estimate_effort_to_review = false
+request_changes_workflow = true
 extra_instructions = """
-- Responda sempre em português do Brasil
+IMPORTANTE: Responda TUDO em português do Brasil, sem exceções.
+Isso inclui títulos, seções, comentários e sugestões.
 - Seja objetivo e direto
-- Foque em: problemas encontrados, riscos de segurança e sugestões práticas
+- Foque em: bugs encontrados, riscos de segurança e sugestões práticas
 - Não gere poemas, walkthroughs longos ou explicações óbvias
+- Se o código estiver correto e sem problemas, aprove o PR
+- Se houver problemas críticos, solicite mudanças
 """
 
 [pr_code_suggestions]
 num_code_suggestions = 4
-
-[github_action_config]
-auto_review = true
-auto_describe = true
-auto_improve = false
