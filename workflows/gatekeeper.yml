@@ -1,0 +1,110 @@
+name: Cypher Gatekeeper
+ 
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+ 
+jobs:
+  conventional-commits:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+ 
+      - name: Validate commit messages
+        run: |
+          # Pattern Conventional Commits
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?: .{1,100}$'
+ 
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+            COMMITS=$(git log --format="%H %s" "$BASE..$HEAD")
+          else
+            # Em push, valida apenas o commit mais recente
+            COMMITS=$(git log --format="%H %s" -1)
+          fi
+ 
+          FAILED=0
+          while IFS= read -r line; do
+            HASH=$(echo "$line" | awk '{print $1}')
+            MSG=$(echo "$line" | cut -d' ' -f2-)
+            if ! echo "$MSG" | grep -qP "$PATTERN"; then
+              echo "❌ Commit inválido: $HASH"
+              echo "   Mensagem: $MSG"
+              echo "   Esperado: <tipo>(<escopo opcional>): <descrição>"
+              echo "   Tipos válidos: feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert"
+              FAILED=1
+            fi
+          done <<< "$COMMITS"
+ 
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "Exemplos válidos:"
+            echo "  feat(auth): adiciona login com Google"
+            echo "  fix: corrige timeout na API"
+            echo "  chore: atualiza dependências"
+            exit 1
+          fi
+ 
+          echo "✅ Todas as mensagens de commit seguem o padrão Conventional Commits."
+ 
+  semgrep-scan:
+    name: Semgrep Security Scan
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Run Semgrep
+        run: |
+          semgrep \
+            --config=auto \
+            --severity=ERROR \
+            --include="*.py" \
+            --include="*.js" \
+            --include="*.sh" \
+            --error \
+            --json-output=semgrep-results.json \
+            . || SEMGREP_EXIT=$?
+ 
+          # Exibe resultados legíveis independente do exit code
+          if [ -f semgrep-results.json ]; then
+            FINDINGS=$(python3 -c "
+          import json, sys
+          with open('semgrep-results.json') as f:
+              data = json.load(f)
+          results = data.get('results', [])
+          if not results:
+              print('Nenhuma vulnerabilidade encontrada.')
+              sys.exit(0)
+          print(f'{len(results)} problema(s) encontrado(s):\n')
+          for r in results:
+              path = r['path']
+              line = r['start']['line']
+              msg  = r['extra']['message']
+              rule = r['check_id']
+              print(f'  ❌ [{rule}]')
+              print(f'     {path}:{line}')
+              print(f'     {msg}')
+              print()
+          ")
+            echo "$FINDINGS"
+          fi
+ 
+          exit ${SEMGREP_EXIT:-0}
+ 
+      - name: Upload Semgrep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 14
